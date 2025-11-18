@@ -65,7 +65,7 @@ Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
 
 1.  **Clone repository**
     ```bash
-    git clone [https://github.com/username/campus-booking.git](https://github.com/username/campus-booking.git)
+    git clone [https://github.com/username/SpaceFlow.git](https://github.com/username/SpaceFlow.git)
     ```
 
 2.  **Masuk Folder Project**

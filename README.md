@@ -1,13 +1,15 @@
 # SpaceFlow – Sistem Peminjaman Ruangan Kampus
 
 ## 1. Deskripsi Singkat
-SpaceFlow adalah aplikasi berbasis web yang memudahkan mahasiswa untuk meminjam ruangan kampus secara online dan membantu petugas (admin) dalam mengelola jadwal serta persetujuan peminjaman ruangan untuk menghindari bentrok jadwal.
+SpaceFlow adalah aplikasi berbasis web yang memudahkan mahasiswa untuk meminjam ruangan kampus dan membantu petugas (admin) dalam mengelola jadwal serta persetujuan peminjaman ruangan untuk menghindari bentrok jadwal.
 
 ## 2. Daftar Fitur
 Berikut adalah fitur utama yang dibangun dalam aplikasi ini:
+### ✨ Fitur Utama
+
 ### 🔐 Autentikasi & Hak Akses
 - **Register & Login:** Pengguna dapat mendaftar dan masuk ke dalam sistem.
-- **Role-based Access:** Sistem membedakan hak akses antara **Admin** (Petugas) dan **User** (Mahasiswa).
+- **Role-based Access:** Sistem membedakan hak akses antara **Admin** (Petugas) dan **Mahasiswa** (User).
 
 ### 👤 Fitur User (Mahasiswa)
 - **Dashboard:** Melihat daftar ruangan yang tersedia.
@@ -20,7 +22,7 @@ Berikut adalah fitur utama yang dibangun dalam aplikasi ini:
 - **Cek Jadwal:** Melihat kalender peminjaman untuk mencegah jadwal ganda.
 
 ## 3. Tech Stack
-Teknologi yang digunakan dalam pengembangan proyek ini:
+### 🔧 Tech Stack
 - **Bahasa:** PHP 8.2+
 - **Framework:** Laravel 11
 - **Database:** MySQL
@@ -28,32 +30,35 @@ Teknologi yang digunakan dalam pengembangan proyek ini:
 - **Arsitektur:** MVC (Model-View-Controller)
 
 ## 4. Skema Database
-Aplikasi ini menggunakan database relasional dengan minimal 3 tabel utama:
+Aplikasi ini menggunakan database relasional dengan minimal 3 tabel utama yang saling terikat oleh **Foreign Key (FK)**.
+
+
+### 🗂️ Tabel Relasi
 
 ### Tabel `users`
 Menyimpan data pengguna aplikasi.
-- `nim` (Primary Key)
+- **`id` (BIGINT, Primary Key)**
 - `name` (Varchar)
+- **`nim` (Varchar, Unique)**
 - `email` (Varchar, Unique)
 - `password` (Varchar)
 - `role` (Enum: 'admin', 'mahasiswa')
 - `created_at`, `updated_at`
 
 ### Tabel `rooms`
-Menyimpan data master ruangan yang bisa dipinjam.
-- `id` (Primary Key)
-- `room_code` (Varchar, Unique) - misal: F2.2
-- `name` (Varchar) - misal: Ruang GKM 4.1
+Menyimpan data master ruangan.
+- **`id` (BIGINT, Primary Key)**
+- `room_code` (Varchar, Unique)
+- `name` (Varchar)
 - `capacity` (Integer)
 - `description` (Text)
-- `image` (Varchar, Nullable)
 - `created_at`, `updated_at`
 
 ### Tabel `bookings`
-Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
-- `id` (Primary Key)
-- `user_id` (Foreign Key -> users.id)
-- `room_id` (Foreign Key -> rooms.id)
+Menyimpan data transaksi peminjaman.
+- **`id` (BIGINT, Primary Key)**
+- **`user_id` (BIGINT, Foreign Key -> users.id)**
+- **`room_id` (BIGINT, Foreign Key -> rooms.id)**
 - `start_time` (DateTime)
 - `end_time` (DateTime)
 - `purpose` (Varchar)
@@ -114,16 +119,16 @@ Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
 | `POST` | `/logout` | Keluar dari sesi | All Authenticated |
 | **ADMIN** | | | |
 | `GET` | `/admin/dashboard` | Dashboard utama Admin | Admin Only |
-| `GET/POST/PUT/DEL`| `/admin/rooms` | CRUD Ruangan | Admin Only |
+| **RESOURCE**| `/admin/rooms` | **CRUD Ruangan** | Admin Only |
 | `PATCH` | `/admin/bookings/{id}/approve` | Setujui peminjaman | Admin Only |
+| **`PATCH`** | **`/admin/bookings/{id}/reject`** | **Tolak peminjaman** | Admin Only |
 | **USER** | | | |
 | `GET` | `/dashboard` | Dashboard Mahasiswa (List Ruangan) | Mahasiswa Only |
-| `GET` | `/bookings/create/{room_id}` | Form pengajuan peminjaman | Mahasiswa Only |
-| `POST` | `/bookings` | Simpan pengajuan peminjaman | Mahasiswa Only |
+| **RESOURCE**| `/bookings` | Pengajuan & detail peminjaman | Mahasiswa Only |
 | `GET` | `/my-bookings` | Riwayat peminjaman | Mahasiswa Only |
 
 ## 7. Anggota Kelompok
 | NIM | Nama | Peran yang Dianjurkan |
 | :--- | :--- | :--- |
-| 245150700111046 | M. Dhika Ferdiansyah | Backend Logic & Database |
-| 245150707111026 | Rafi Al Musa   | Frontend (UI/UX) & Blade Templating |
+| 245150700111046 | M. Dhika Ferdiansyah | Backend Logic, Database Migrations, & APIs |
+| 245150707111026 | Rafi Al Musa | Frontend (UI/UX), Blade Templating |

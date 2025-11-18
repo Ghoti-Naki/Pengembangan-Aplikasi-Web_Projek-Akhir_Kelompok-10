@@ -122,7 +122,7 @@ Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
 | `POST` | `/bookings` | Simpan pengajuan peminjaman | Mahasiswa Only |
 | `GET` | `/my-bookings` | Riwayat peminjaman | Mahasiswa Only |
 
-## 8. Anggota Kelompok
+## 7. Anggota Kelompok
 | NIM | Nama | Peran yang Dianjurkan |
 | :--- | :--- | :--- |
 | 245150700111046 | M. Dhika Ferdiansyah | Backend Logic & Database |

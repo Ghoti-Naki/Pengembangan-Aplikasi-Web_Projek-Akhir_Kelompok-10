@@ -126,5 +126,4 @@ Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
 | NIM | Nama | Peran yang Dianjurkan |
 | :--- | :--- | :--- |
 | 245150700111046 | M. Dhika Ferdiansyah | Backend Logic & Database |
-| NIM_TEMAN_1 | [Nama Teman 1] | Frontend (UI/UX) & Blade Templating |
-| NIM_TEMAN_2 | [Nama Teman 2] | Authentication & Middleware |
+| 245150707111026 | Rafi Al Musa   | Frontend (UI/UX) & Blade Templating |

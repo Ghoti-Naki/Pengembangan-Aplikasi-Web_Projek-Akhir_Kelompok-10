@@ -1,7 +1,7 @@
-# Campus Booking – Sistem Peminjaman Ruangan Kampus
+# SpaceFlow – Sistem Peminjaman Ruangan Kampus
 
 ## 1. Deskripsi Singkat
-Campus Booking adalah aplikasi berbasis web yang memudahkan mahasiswa untuk meminjam ruangan kampus secara online dan membantu petugas (admin) dalam mengelola jadwal serta persetujuan peminjaman ruangan untuk menghindari bentrok jadwal.
+SpaceFlow adalah aplikasi berbasis web yang memudahkan mahasiswa untuk meminjam ruangan kampus secara online dan membantu petugas (admin) dalam mengelola jadwal serta persetujuan peminjaman ruangan untuk menghindari bentrok jadwal.
 
 ## 2. Daftar Fitur
 Berikut adalah fitur utama yang dibangun dalam aplikasi ini:
@@ -32,7 +32,7 @@ Aplikasi ini menggunakan database relasional dengan minimal 3 tabel utama:
 
 ### Tabel `users`
 Menyimpan data pengguna aplikasi.
-- `id` (Primary Key)
+- `nim` (Primary Key)
 - `name` (Varchar)
 - `email` (Varchar, Unique)
 - `password` (Varchar)
@@ -42,8 +42,8 @@ Menyimpan data pengguna aplikasi.
 ### Tabel `rooms`
 Menyimpan data master ruangan yang bisa dipinjam.
 - `id` (Primary Key)
-- `room_code` (Varchar, Unique) - misal: A101
-- `name` (Varchar) - misal: Ruang Teori 1
+- `room_code` (Varchar, Unique) - misal: F2.2
+- `name` (Varchar) - misal: Ruang GKM 4.1
 - `capacity` (Integer)
 - `description` (Text)
 - `image` (Varchar, Nullable)
@@ -64,4 +64,4 @@ Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
 
 **a. Clone Repository**
 ```bash
-git clone [https://github.com/username/campus-booking.git](https://github.com/username/campus-booking.git)
+git clone [https://github.com/username/SpaceFlow.git](https://github.com/username/SpaceFlow.git)

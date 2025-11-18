@@ -60,8 +60,71 @@ Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
 - `status` (Enum: 'pending', 'approved', 'rejected')
 - `created_at`, `updated_at`
 
-## 5. Cara Menjalankan Project (Localhost)
+## 5. Cara Install / Cara Menjalankan
+### 🚀 Cara Menjalankan (Local Development)
 
-**a. Clone Repository**
-```bash
-git clone [https://github.com/username/SpaceFlow.git](https://github.com/username/SpaceFlow.git)
+1.  **Clone repository**
+    ```bash
+    git clone [https://github.com/username/campus-booking.git](https://github.com/username/campus-booking.git)
+    ```
+
+2.  **Masuk Folder Project**
+    ```bash
+    cd campus-booking
+    ```
+
+3.  **Install Dependencies**
+    ```bash
+    composer install
+    npm install
+    ```
+
+4.  **Setup Environment**
+    - Copy file `.env.example` menjadi `.env`.
+    - Atur konfigurasi database (`DB_DATABASE`, `DB_USERNAME`, dll) di file `.env`.
+    
+5.  **Generate Key**
+    ```bash
+    php artisan key:generate
+    ```
+
+6.  **Jalankan Migrasi (Membuat Tabel)**
+    ```bash
+    php artisan migrate
+    ```
+
+7.  **Jalankan Project**
+    Buka dua terminal dan jalankan kedua perintah ini secara bersamaan:
+    ```bash
+    # Terminal 1 (Backend Server)
+    php artisan serve
+
+    # Terminal 2 (Frontend Assets Watcher)
+    npm run dev
+    ```
+
+## 6. List Endpoint / Route
+### 📌 List Endpoint / Route
+
+| Metode | Jalur (Path) | Keterangan | Akses |
+| :--- | :--- | :--- | :--- |
+| **AUTH** | | | |
+| `GET` | `/login` | Tampilkan form login | Public |
+| `POST` | `/login` | Proses autentikasi | Public |
+| `POST` | `/logout` | Keluar dari sesi | All Authenticated |
+| **ADMIN** | | | |
+| `GET` | `/admin/dashboard` | Dashboard utama Admin | Admin Only |
+| `GET/POST/PUT/DEL`| `/admin/rooms` | CRUD Ruangan | Admin Only |
+| `PATCH` | `/admin/bookings/{id}/approve` | Setujui peminjaman | Admin Only |
+| **USER** | | | |
+| `GET` | `/dashboard` | Dashboard Mahasiswa (List Ruangan) | Mahasiswa Only |
+| `GET` | `/bookings/create/{room_id}` | Form pengajuan peminjaman | Mahasiswa Only |
+| `POST` | `/bookings` | Simpan pengajuan peminjaman | Mahasiswa Only |
+| `GET` | `/my-bookings` | Riwayat peminjaman | Mahasiswa Only |
+
+## 8. Anggota Kelompok
+| NIM | Nama | Peran yang Dianjurkan |
+| :--- | :--- | :--- |
+| 245150700111046 | M. Dhika Ferdiansyah | Backend Logic & Database |
+| NIM_TEMAN_1 | [Nama Teman 1] | Frontend (UI/UX) & Blade Templating |
+| NIM_TEMAN_2 | [Nama Teman 2] | Authentication & Middleware |

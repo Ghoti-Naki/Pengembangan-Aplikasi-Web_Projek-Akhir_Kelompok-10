@@ -70,7 +70,7 @@ Menyimpan data transaksi peminjaman (menghubungkan User dan Room).
 
 2.  **Masuk Folder Project**
     ```bash
-    cd campus-booking
+    cd SpaceFlow
     ```
 
 3.  **Install Dependencies**

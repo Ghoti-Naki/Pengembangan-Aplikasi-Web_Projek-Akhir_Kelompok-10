@@ -1,59 +1,156 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SpaceFlow – Sistem Peminjaman Ruangan Kampus
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 1. Deskripsi Singkat
 
-## About Laravel
+SpaceFlow adalah aplikasi berbasis web yang memudahkan mahasiswa untuk meminjam ruangan kampus dan membantu petugas (admin) dalam mengelola jadwal serta persetujuan peminjaman ruangan untuk menghindari bentrok jadwal.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 2. Daftar Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Berikut adalah fitur utama yang dibangun dalam aplikasi ini:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### ✨ Fitur Utama
 
-## Learning Laravel
+### 🔐 Autentikasi & Hak Akses
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+-   **Register & Login:** Pengguna dapat mendaftar dan masuk ke dalam sistem.
+-   **Role-based Access:** Sistem membedakan hak akses antara **Admin** (Petugas) dan **Mahasiswa** (User).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 👤 Fitur User (Mahasiswa)
 
-## Laravel Sponsors
+-   **Dashboard:** Melihat daftar ruangan yang tersedia.
+-   **Booking Ruangan:** Mengajukan peminjaman ruangan berdasarkan tanggal dan waktu.
+-   **Riwayat Peminjaman:** Melihat status pengajuan (Pending, Disetujui, Ditolak).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🛠️ Fitur Admin (Petugas)
 
-### Premium Partners
+-   **Kelola Ruangan (CRUD):** Menambah, mengedit, dan menghapus data ruangan.
+-   **Validasi Peminjaman:** Menyetujui atau menolak pengajuan peminjaman dari mahasiswa.
+-   **Cek Jadwal:** Melihat kalender peminjaman untuk mencegah jadwal ganda.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 3. Tech Stack
 
-## Contributing
+### 🔧 Tech Stack
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+-   **Bahasa:** PHP 8.2+
+-   **Framework:** Laravel 11
+-   **Database:** MySQL
+-   **Frontend:** Blade Template + Tailwind CSS (Bawaan Laravel Breeze)
+-   **Arsitektur:** MVC (Model-View-Controller)
 
-## Code of Conduct
+## 4. Skema Database
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Aplikasi ini menggunakan database relasional dengan minimal 3 tabel utama yang saling terikat oleh **Foreign Key (FK)**.
 
-## Security Vulnerabilities
+### 🗂️ Tabel Relasi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Tabel `users`
 
-## License
+Menyimpan data pengguna aplikasi.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+-   **`id` (BIGINT, Primary Key)**
+-   `name` (Varchar)
+-   **`nim` (Varchar, Unique)**
+-   `email` (Varchar, Unique)
+-   `password` (Varchar)
+-   `role` (Enum: 'admin', 'mahasiswa')
+-   `created_at`, `updated_at`
+
+### Tabel `rooms`
+
+Menyimpan data master ruangan.
+
+-   **`id` (BIGINT, Primary Key)**
+-   `room_code` (Varchar, Unique)
+-   `name` (Varchar)
+-   `capacity` (Integer)
+-   `description` (Text)
+-   `created_at`, `updated_at`
+
+### Tabel `bookings`
+
+Menyimpan data transaksi peminjaman.
+
+-   **`id` (BIGINT, Primary Key)**
+-   **`user_id` (BIGINT, Foreign Key -> users.id)**
+-   **`room_id` (BIGINT, Foreign Key -> rooms.id)**
+-   `start_time` (DateTime)
+-   `end_time` (DateTime)
+-   `purpose` (Varchar)
+-   `status` (Enum: 'pending', 'approved', 'rejected')
+-   `created_at`, `updated_at`
+
+## 5. Cara Install / Cara Menjalankan
+
+### 🚀 Cara Menjalankan (Local Development)
+
+1.  **Clone repository**
+
+    ```bash
+    git clone [https://github.com/Ghoti-Naki/SpaceFlow.git](https://github.com/Ghoti-Naki/SpaceFlow.git)
+    ```
+
+2.  **Masuk Folder Project**
+
+    ```bash
+    cd SpaceFlow
+    ```
+
+3.  **Install Dependencies**
+
+    ```bash
+    composer install
+    npm install
+    ```
+
+4.  **Setup Environment**
+    -   Copy file `.env.example` menjadi `.env`.
+    -   Atur konfigurasi database (`DB_DATABASE`, `DB_USERNAME`, dll) di file `.env`.
+5.  **Generate Key**
+
+    ```bash
+    php artisan key:generate
+    ```
+
+6.  **Jalankan Migrasi (Membuat Tabel)**
+
+    ```bash
+    php artisan migrate
+    ```
+
+7.  **Jalankan Project**
+    Buka dua terminal dan jalankan kedua perintah ini secara bersamaan:
+
+    ```bash
+    # Terminal 1 (Backend Server)
+    php artisan serve
+
+    # Terminal 2 (Frontend Assets Watcher)
+    npm run dev
+    ```
+
+## 6. List Endpoint / Route
+
+### 📌 List Endpoint / Route
+
+| Metode       | Jalur (Path)                      | Keterangan                         | Akses             |
+| :----------- | :-------------------------------- | :--------------------------------- | :---------------- |
+| **AUTH**     |                                   |                                    |                   |
+| `GET`        | `/login`                          | Tampilkan form login               | Public            |
+| `POST`       | `/login`                          | Proses autentikasi                 | Public            |
+| `POST`       | `/logout`                         | Keluar dari sesi                   | All Authenticated |
+| **ADMIN**    |                                   |                                    |                   |
+| `GET`        | `/admin/dashboard`                | Dashboard utama Admin              | Admin Only        |
+| **RESOURCE** | `/admin/rooms`                    | **CRUD Ruangan**                   | Admin Only        |
+| `PATCH`      | `/admin/bookings/{id}/approve`    | Setujui peminjaman                 | Admin Only        |
+| **`PATCH`**  | **`/admin/bookings/{id}/reject`** | **Tolak peminjaman**               | Admin Only        |
+| **USER**     |                                   |                                    |                   |
+| `GET`        | `/dashboard`                      | Dashboard Mahasiswa (List Ruangan) | Mahasiswa Only    |
+| **RESOURCE** | `/bookings`                       | Pengajuan & detail peminjaman      | Mahasiswa Only    |
+| `GET`        | `/my-bookings`                    | Riwayat peminjaman                 | Mahasiswa Only    |
+
+## 7. Anggota Kelompok
+
+| NIM             | Nama                 | Peran yang Dianjurkan                      |
+| :-------------- | :------------------- | :----------------------------------------- |
+| 245150700111046 | M. Dhika Ferdiansyah | Backend Logic, Database Migrations, & APIs |
+| 245150707111026 | Rafi Al Musa         | Frontend (UI/UX), Blade Templating         |

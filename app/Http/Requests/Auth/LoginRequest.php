@@ -82,4 +82,17 @@ class LoginRequest extends FormRequest
     {
         return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
     }
+
+    /**
+     * Get the redirect path for the user after authentication.
+     */
+    public function redirectPath(): string
+    {
+        // Cek Role User yang baru saja login
+        if (auth()->user()->isAdmin()) {
+            return route('admin.dashboard'); // Jika Admin, arahkan ke rute Admin
+        }
+
+        return route('dashboard'); // Jika Mahasiswa/User, arahkan ke rute Mahasiswa
+    }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Room;
+use App\Models\Booking;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminRoomController;
 use App\Http\Controllers\UserBookingController;
@@ -21,7 +23,11 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
-        return view('admin.dashboard'); 
+        $totalRooms = Room::count();
+        $pendingBookings = Booking::where('status', 'pending')->count();
+        $approvedBookings = Booking::where('status', 'approved')->count();
+
+        return view('admin.dashboard', compact('totalRooms', 'pendingBookings', 'approvedBookings'));
     })->name('admin.dashboard');
 
     Route::resource('rooms', AdminRoomController::class)->names('admin.rooms');

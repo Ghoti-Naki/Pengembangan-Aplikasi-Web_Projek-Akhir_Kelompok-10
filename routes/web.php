@@ -37,7 +37,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::patch('/bookings/{booking}/reject', [AdminBookingController::class, 'reject'])->name('admin.bookings.reject');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'nim.filled'])->group(function () {
 
     Route::get('/bookings/create/{room}', [UserBookingController::class, 'create'])->name('user.bookings.create');
     Route::post('/bookings', [UserBookingController::class, 'store'])->name('user.bookings.store');

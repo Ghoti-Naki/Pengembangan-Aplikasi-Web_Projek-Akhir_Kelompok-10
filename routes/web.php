@@ -23,9 +23,9 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
-        $totalRooms = Room::count();
-        $pendingBookings = Booking::where('status', 'pending')->count();
-        $approvedBookings = Booking::where('status', 'approved')->count();
+        $totalRooms = \App\Models\Room::count();
+        $pendingBookings = \App\Models\Booking::where('status', 'pending')->count();
+        $approvedBookings = \App\Models\Booking::where('status', 'approved')->count();
 
         return view('admin.dashboard', compact('totalRooms', 'pendingBookings', 'approvedBookings'));
     })->name('admin.dashboard');

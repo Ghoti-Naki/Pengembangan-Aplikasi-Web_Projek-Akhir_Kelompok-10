@@ -12,14 +12,12 @@ class AdminRoomController extends Controller
     public function index()
     {
         $rooms = Room::orderBy('room_code')->get();
-        // Mengarahkan ke view admin/rooms/index.blade.php
         return view('admin.rooms.index', compact('rooms')); 
     }
 
     // Menampilkan formulir tambah ruangan
     public function create()
     {
-        // Mengarahkan ke view admin/rooms/create.blade.php
         return view('admin.rooms.create');
     }
 
@@ -30,17 +28,18 @@ class AdminRoomController extends Controller
     {
         // 1. Validasi Data
         $validated = $request->validate([
-            'room_code' => 'required|string|unique:rooms,room_code', // Harus unik
+            'room_code' => 'required|string|unique:rooms,room_code',
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Jika ada upload gambar
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 2. Proses Upload Gambar (Jika ada)
+        // 2. Proses Upload Gambar (PERBAIKAN DISINI)
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('public/rooms');
-            $validated['image'] = basename($path); // Simpan hanya nama filenya
+            // Gunakan parameter kedua 'public' agar masuk ke storage/app/public/rooms
+            $path = $request->file('image')->store('rooms', 'public');
+            $validated['image'] = basename($path); 
         }
 
         // 3. Simpan ke Database
@@ -63,7 +62,6 @@ class AdminRoomController extends Controller
      */
     public function edit(Room $room)
     {
-        // Mengirim objek $room ke view edit
         return view('admin.rooms.edit', compact('room'));
     }
 
@@ -73,7 +71,6 @@ class AdminRoomController extends Controller
     public function update(Request $request, Room $room)
     {
         $validated = $request->validate([
-            // Pastikan unique:rooms mengabaikan ruangan saat ini
             'room_code' => 'required|string|unique:rooms,room_code,'.$room->id, 
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
@@ -81,12 +78,15 @@ class AdminRoomController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
         ]);
 
-        // Proses Upload/Update Gambar (jika ada file baru)
+        // Proses Upload/Update Gambar (PERBAIKAN DISINI)
         if ($request->hasFile('image')) {
-            // Logika tambahan: Hapus gambar lama jika ada
-            // Storage::delete('public/rooms/' . $room->image); 
+            // Hapus gambar lama jika ada agar server tidak penuh
+            if ($room->image) {
+                Storage::disk('public')->delete('rooms/' . $room->image);
+            }
 
-            $path = $request->file('image')->store('public/rooms');
+            // Simpan gambar baru ke disk 'public'
+            $path = $request->file('image')->store('rooms', 'public');
             $validated['image'] = basename($path);
         }
 
@@ -102,10 +102,14 @@ class AdminRoomController extends Controller
      */
     public function destroy(Room $room)
     {
+        // Hapus fisik gambar jika ada
+        if ($room->image) {
+            Storage::disk('public')->delete('rooms/' . $room->image);
+        }
+
         // Hapus ruangan dari database
         $room->delete();
 
-        // Redirect kembali dengan pesan sukses
         return redirect()->route('admin.rooms.index')
             ->with('success', 'Ruangan berhasil dihapus.');
     }

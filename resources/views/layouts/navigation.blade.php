@@ -24,6 +24,10 @@
                             {{ __('Validasi Peminjaman') }}
                         </x-nav-link>
 
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                            {{ __('Data Pengguna') }}
+                        </x-nav-link>
+
                     @else
                         {{-- MENU KHUSUS MAHASISWA --}}
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">

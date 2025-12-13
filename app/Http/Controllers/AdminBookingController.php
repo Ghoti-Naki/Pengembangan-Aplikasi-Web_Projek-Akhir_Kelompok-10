@@ -10,26 +10,30 @@ class AdminBookingController extends Controller
     // Menampilkan daftar SEMUA peminjaman untuk Admin
     public function index()
     {
-        $bookings = Booking::with(['user', 'room'])
-                          ->orderBy('created_at', 'desc')
-                          ->get();
-                          
+        // Tampilkan booking terbaru dulu, beserta data user, room, peserta, dan tamu
+        $bookings = Booking::with(['user', 'room', 'participants', 'guests'])
+                    ->latest()
+                    ->get();
+                    
         return view('admin.bookings.index', compact('bookings'));
     }
 
     // Mengubah status peminjaman menjadi 'approved'
-    public function approve(Booking $booking)
+    public function updateStatus(Request $request, Booking $booking)
     {
-        $booking->update(['status' => 'approved']);
+        // Validasi input hanya boleh 'approved' atau 'rejected'
+        $request->validate([
+            'status' => 'required|in:approved,rejected'
+        ]);
 
-        return back()->with('success', 'Peminjaman berhasil disetujui!');
-    }
+        // Update status di database
+        $booking->update([
+            'status' => $request->status
+        ]);
 
-    // Mengubah status peminjaman menjadi 'rejected'
-    public function reject(Booking $booking)
-    {
-        $booking->update(['status' => 'rejected']);
-
-        return back()->with('success', 'Peminjaman berhasil ditolak.');
+        // Redirect kembali dengan pesan
+        $pesan = $request->status == 'approved' ? 'Peminjaman disetujui!' : 'Peminjaman ditolak.';
+        
+        return back()->with('success', $pesan);
     }
 }

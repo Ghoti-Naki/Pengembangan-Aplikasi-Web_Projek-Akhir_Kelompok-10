@@ -22,56 +22,102 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruangan</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peminjam (NIM)</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu & Tujuan</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Peminjam</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Ruangan & Waktu</th>
+                                    {{-- KOLOM BARU --}}
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Daftar Peserta</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status & Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse ($bookings as $booking)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $booking->room->room_code ?? '-' }} - {{ $booking->room->name ?? 'Ruangan Dihapus' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $booking->user->name ?? 'User Dihapus' }} ({{ $booking->user->nim ?? 'N/A' }})</td>
-                                        <td class="px-6 py-4">
-                                            <p class="text-sm">Mulai: {{ \Carbon\Carbon::parse($booking->start_time)->format('d M Y H:i') }}</p>
-                                            <p class="text-sm">Selesai: {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}</p>
-                                            <p class="text-xs text-indigo-600">Tujuan: {{ $booking->purpose }}</p>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                @if($booking->status == 'approved') bg-green-100 text-green-800 
-                                                @elseif($booking->status == 'rejected') bg-red-100 text-red-800
-                                                @else bg-yellow-100 text-yellow-800 @endif">
+                                @foreach($bookings as $booking)
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="font-bold text-gray-900">{{ $booking->user->name }}</div>
+                                        <div class="text-xs text-gray-500">{{ $booking->user->nim ?? 'Dosen' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-medium">{{ $booking->room->name }}</div>
+                                        <div class="text-xs text-gray-500">
+                                            {{ \Carbon\Carbon::parse($booking->start_time)->format('d M Y, H:i') }}
+                                        </div>
+                                    </td>
+                                    
+                                    {{-- LOGIC MENAMPILKAN PESERTA --}}
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        <details class="cursor-pointer group">
+                                            <summary class="font-medium text-indigo-600 hover:text-indigo-800 focus:outline-none">
+                                                Lihat Peserta ({{ $booking->participants->count() + $booking->guests->count() }})
+                                            </summary>
+                                            <div class="mt-2 p-3 bg-gray-50 rounded text-xs space-y-2 border border-gray-100">
+                                                
+                                                {{-- 1. PESERTA INTERNAL --}}
+                                                @if($booking->participants->isNotEmpty())
+                                                    <div>
+                                                        <strong class="text-gray-700 block mb-1">Mahasiswa/Dosen:</strong>
+                                                        <ul class="list-disc pl-4 space-y-0.5">
+                                                            @foreach($booking->participants as $p)
+                                                                <li>{{ $p->name }}</li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
+                                                @endif
+
+                                                {{-- 2. TAMU EKSTERNAL --}}
+                                                @if($booking->guests->isNotEmpty())
+                                                    <div class="{{ $booking->participants->isNotEmpty() ? 'mt-2 border-t pt-2' : '' }}">
+                                                        <strong class="text-gray-700 block mb-1">Tamu Eksternal:</strong>
+                                                        <ul class="list-disc pl-4 space-y-0.5">
+                                                            @foreach($booking->guests as $g)
+                                                                <li>
+                                                                    <span class="font-semibold">{{ $g->email }}</span>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
+                                                @endif
+
+                                                @if($booking->participants->isEmpty() && $booking->guests->isEmpty())
+                                                    <span class="text-gray-400 italic">Tidak ada peserta tambahan.</span>
+                                                @endif
+                                            </div>
+                                        </details>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                    {{-- Tombol Aksi (Approve/Reject) Anda yang sudah ada --}}
+                                        @if($booking->status == 'pending')
+                                            <div class="flex space-x-2">
+                                                {{-- TOMBOL SETUJUI --}}
+                                                <form action="{{ route('admin.bookings.updateStatus', $booking) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="status" value="approved">
+                                                    <button type="submit" class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded-md text-xs font-bold transition flex items-center" title="Setujui">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                        Terima
+                                                    </button>
+                                                </form>
+
+                                                {{-- TOMBOL TOLAK --}}
+                                                <form action="{{ route('admin.bookings.updateStatus', $booking) }}" method="POST" onsubmit="return confirm('Yakin ingin menolak?');">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="status" value="rejected">
+                                                    <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-md text-xs font-bold transition flex items-center" title="Tolak">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        Tolak
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            <span class="px-2 py-1 rounded {{ $booking->status == 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} text-xs font-bold">
                                                 {{ ucfirst($booking->status) }}
                                             </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            @if($booking->status == 'pending')
-                                                {{-- Tombol Approve --}}
-                                                <form action="{{ route('admin.bookings.approve', $booking) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="text-green-600 hover:text-green-900 mr-2">Setujui</button>
-                                                </form>
-                                                
-                                                {{-- Tombol Reject --}}
-                                                <form action="{{ route('admin.bookings.reject', $booking) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900">Tolak</button>
-                                                </form>
-                                            @else
-                                                <span class="text-gray-500">Selesai</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada pengajuan peminjaman saat ini.</td>
-                                    </tr>
-                                @endforelse
+                                    @endif
+                                    </td>
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

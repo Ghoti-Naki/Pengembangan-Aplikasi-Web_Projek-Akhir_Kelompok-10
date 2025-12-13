@@ -29,4 +29,14 @@ class Booking extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'booking_participants');
+    }
+
+    public function guests()
+    {
+        return $this->hasMany(BookingGuest::class);
+    }
 }

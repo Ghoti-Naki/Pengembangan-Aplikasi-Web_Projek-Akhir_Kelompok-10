@@ -79,7 +79,42 @@
                             @error('purpose') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Input Peserta Internal --}}
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Undang Peserta (Mahasiswa/Dosen)</label>
+                            <select name="participants[]" multiple class="w-full border-gray-300 rounded-lg shadow-sm h-32 focus:border-indigo-500 focus:ring-indigo-500">
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->nim ?? 'Dosen' }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">*Tahan tombol Ctrl (Windows) atau Cmd (Mac) untuk memilih lebih dari satu.</p>
+                        </div>
+
+                        {{-- Input Peserta Eksternal (BARU DITAMBAHKAN DISINI) --}}
+                        <div class="mt-6">
+                            <label for="external_guests" class="block text-sm font-medium text-gray-700 mb-1">
+                                Undang Pihak Luar / Email Eksternal (Opsional)
+                            </label>
+                            <div class="relative">
+                                <textarea 
+                                    name="external_guests" 
+                                    id="external_guests" 
+                                    rows="3" 
+                                    class="w-full border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 pl-10 pt-3"
+                                    placeholder="Contoh: dosen.tamu@yahoo.com, pemateri@gmail.com"
+                                ></textarea>
+                                <div class="absolute top-3 left-3 pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">
+                                *Masukkan alamat email dipisahkan dengan <strong>koma (,)</strong>. Undangan akan dikirim ke email tersebut.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                             <div>
                                 <label for="start_time" class="block text-sm font-medium text-gray-700 mb-1">Waktu Mulai</label>
                                 <input type="datetime-local" name="start_time" id="start_time" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 cursor-pointer" value="{{ old('start_time') }}" required>

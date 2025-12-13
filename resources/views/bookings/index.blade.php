@@ -40,6 +40,8 @@
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Waktu</th>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tujuan</th>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                                        {{-- KOLOM BARU: AKSI --}}
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi (Undangan)</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -66,22 +68,69 @@
                                                     {{ $booking->purpose }}
                                                 </div>
                                             </td>
+
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($booking->status == 'approved')
-                                                    <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-green-100 text-green-800 border border-green-200">
-                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                                        Disetujui
-                                                    </span>
-                                                @elseif($booking->status == 'rejected')
-                                                    <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-red-100 text-red-800 border border-red-200">
-                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                        Ditolak
-                                                    </span>
+                                                    <div class="flex flex-col space-y-2">
+                                                        
+                                                        {{-- TOMBOL 1: BROADCAST EMAIL (Otomatis Server) --}}
+                                                        <form action="{{ route('user.bookings.broadcast', $booking) }}" method="POST">
+                                                            @csrf
+                                                            <button type="submit" class="w-full inline-flex justify-center items-center px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded shadow transition">
+                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                                                Broadcast Email
+                                                            </button>
+                                                        </form>
+
+                                                        {{-- TOMBOL 2: KIRIM WA (Manual Link) --}}
+                                                        @php
+                                                            // 1. Ambil Nama Peserta
+                                                            $participantNames = $booking->participants ? $booking->participants->pluck('name')->toArray() : [];
+                                                            
+                                                            if (empty($participantNames)) {
+                                                                $listPeserta = "-";
+                                                            } else {
+                                                                // Buat list menurun dengan bullet point strip
+                                                                $listPeserta = "";
+                                                                foreach($participantNames as $name) {
+                                                                    $listPeserta .= "%0A- " . $name;
+                                                                }
+                                                            }
+
+                                                            // 2. Format Waktu Indonesia
+                                                            $waktuMulai = \Carbon\Carbon::parse($booking->start_time)->translatedFormat('l, d F Y');
+                                                            $jamMulai   = \Carbon\Carbon::parse($booking->start_time)->format('H:i');
+                                                            $jamSelesai = \Carbon\Carbon::parse($booking->end_time)->format('H:i');
+
+                                                            // 3. Susun Pesan WA (Formal & Detail)
+                                                            // %0A adalah kode untuk Enter (Baris Baru)
+                                                            
+                                                            $pesan  = "*UNDANGAN KEGIATAN KAMPUS*%0A%0A";
+                                                            $pesan .= "Yth. Rekan Mahasiswa/Dosen,%0A";
+                                                            $pesan .= "Kami mengundang Anda untuk menghadiri kegiatan berikut:%0A%0A";
+                                                            
+                                                            $pesan .= "*Nama Kegiatan:*%0A" . $booking->purpose . "%0A%0A";
+                                                            $pesan .= "*Lokasi:*%0A" . ($booking->room->name ?? 'Ruangan') . "%0A%0A";
+                                                            $pesan .= "*Waktu Pelaksanaan:*%0A";
+                                                            $pesan .= "Hari/Tgl: " . $waktuMulai . "%0A";
+                                                            $pesan .= "Pukul: " . $jamMulai . " - " . $jamSelesai . " WIB%0A%0A";
+                                                            
+                                                            $pesan .= "*Daftar Peserta Undangan:*";
+                                                            $pesan .= $listPeserta . "%0A%0A";
+                                                            
+                                                            $pesan .= "Demikian undangan ini kami sampaikan. Mohon kehadirannya tepat waktu. Terima kasih.";
+                                                            
+                                                            // Generate Link
+                                                            $wa_link = "https://wa.me/?text=" . $pesan;
+                                                        @endphp
+
+                                                        <a href="{{ $wa_link }}" target="_blank" class="w-full inline-flex justify-center items-center px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded shadow transition">
+                                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                                            Share ke WA
+                                                        </a>
+                                                    </div>
                                                 @else
-                                                    <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                        Menunggu
-                                                    </span>
+                                                    <span class="text-gray-400 text-xs italic">Menunggu persetujuan</span>
                                                 @endif
                                             </td>
                                         </tr>

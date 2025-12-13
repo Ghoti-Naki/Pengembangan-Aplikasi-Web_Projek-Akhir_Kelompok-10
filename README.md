@@ -83,7 +83,7 @@ Sistem ini menggunakan Relational Database dengan struktur berikut:
 4.  **Generate Key, Storage Link & Migrate**
     ```bash
     php artisan key:generate
-    php artisan storage:link  # Wajib agar foto ruangan muncul
+    php artisan storage:link
     php artisan migrate:fresh --seed
     ```
 
